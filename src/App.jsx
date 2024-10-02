@@ -70,7 +70,6 @@ export default function App() {
 
           data: form.get("image"),
         }).result;
-
     fetchNotes();
     event.target.reset();
   }
