@@ -6,17 +6,22 @@ import {
   TextField,
   Heading,
   Flex,
+  TextAreaField,
   View,
   Image,
   Grid,
   Divider,
 } from "@aws-amplify/ui-react";
-import { Amplify } from "aws-amplify";
 import "@aws-amplify/ui-react/styles.css";
-import { getUrl } from "aws-amplify/storage";
-import { uploadData } from "aws-amplify/storage";
+
+import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
+import { getUrl, uploadData } from "aws-amplify/storage";
+
+import OpenAI from "openai";
+
 import outputs from "../amplify_outputs.json";
+
 /**
  * @type {import('aws-amplify/data').Client<import('../amplify/data/resource').Schema>}
  */
@@ -52,6 +57,7 @@ export default function App() {
   }
 
   async function createNote(event) {
+    console.log('create note!!!!!');
     event.preventDefault();
     const form = new FormData(event.target);
     console.log(form.get("image").name);
@@ -87,6 +93,41 @@ export default function App() {
     fetchNotes();
   }
 
+  const AiDescription = () => {
+    // 使用 useState 来控制 TextField 的值
+    const [description, setDescription] = useState("");
+
+    // 模拟自动填充数据
+    const handleSetNewDescription = async () => {
+      const result = await client.queries.improveEnglish({
+        description: description,
+      })
+      setDescription(
+        result.data
+      );
+    };
+
+    return (
+      <div>
+        <TextAreaField
+          name="description"
+          placeholder="Enter your note description"
+          label="Note Description"
+          labelHidden
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={6}  // 控制显示的行数
+        />
+        <Button
+          variation="primary"
+          onClick={() => handleSetNewDescription()}
+        >
+          Set New Description
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <Authenticator>
       {({ signOut }) => (
@@ -114,14 +155,7 @@ export default function App() {
                 variation="quiet"
                 required
               />
-              <TextField
-                name="description"
-                placeholder="Note Description"
-                label="Note Description"
-                labelHidden
-                variation="quiet"
-                required
-              />
+              <AiDescription />
               <View
                 name="image"
                 as="input"
