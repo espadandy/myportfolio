@@ -7,6 +7,8 @@ import Home from './pages/Home'
 import LoginView from './pages/LoginView'
 
 import "@aws-amplify/ui-react/styles.css";
+import GalleryView from './pages/GalleryView';
+import './App.css';
 
 export default function App() {
   return (
@@ -16,6 +18,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/apps" element={<NotesView />} />
         <Route path="/login/*" element={<LoginView />} />
+        <Route path="/gallery" element={<GalleryView />} />
       </Routes>
     </Router>
   );

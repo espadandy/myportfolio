@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import {
     Authenticator,
     Button,
@@ -25,12 +26,6 @@ Amplify.configure(outputs);
 const client = generateClient({
     authMode: "userPool",
 });
-
-/**
- * @type {import('aws-amplify/data').Client<import('../amplify/data/resource').Schema>}
- */
-
-
 
 export default function NotesView() {
     const [notes, setNotes] = useState([]);
@@ -95,10 +90,8 @@ export default function NotesView() {
     }
 
     const AiDescription = () => {
-        // 使用 useState 来控制 TextField 的值
         const [description, setDescription] = useState("");
 
-        // 模拟自动填充数据
         const handleSetNewDescription = async () => {
             const result = await client.queries.improveEnglish({
                 description: description,
@@ -130,90 +123,93 @@ export default function NotesView() {
     };
 
     return (
-        <Authenticator>
-            {({ signOut }) => (
-                <Flex
-                    className="App"
-                    justifyContent="center"
-                    alignItems="center"
-                    direction="column"
-                    width="70%"
-                    margin="0 auto"
-                >
-                    <Heading level={1}>My Notes App</Heading>
-                    <View as="form" margin="3rem 0" onSubmit={createNote}>
-                        <Flex
-                            direction="column"
-                            justifyContent="center"
-                            gap="2rem"
-                            padding="2rem"
-                        >
-                            <TextField
-                                name="name"
-                                placeholder="Note Name"
-                                label="Note Name"
-                                labelHidden
-                                variation="quiet"
-                                required
-                            />
-                            <AiDescription />
-                            <View
-                                name="image"
-                                as="input"
-                                type="file"
-                                alignSelf={"end"}
-                                accept="image/png, image/jpeg"
-                            />
-
-                            <Button type="submit" variation="primary">
-                                Save Note
-                            </Button>
-                        </Flex>
-                    </View>
-                    <Divider />
-                    <Heading level={2}>Current Notes</Heading>
-                    <Grid
-                        margin="3rem 0"
-                        autoFlow="column"
+        <Flex direction={'column'}>
+            <Heading>This is a note-taking application. After signing up, users can create notes that include a title, description, and image. The description can be enhanced with just one click using the GPT model. The application is hosted on Amazon Amplify.</Heading>
+            <Authenticator>
+                {({ signOut }) => (
+                    <Flex
+                        className="App"
                         justifyContent="center"
-                        gap="2rem"
-                        alignContent="center"
+                        alignItems="center"
+                        direction="column"
+                        width="70%"
+                        margin="0 auto"
                     >
-                        {notes.map((note) => (
+                        <Heading level={1}>My Notes App</Heading>
+                        <View as="form" margin="3rem 0" onSubmit={createNote}>
                             <Flex
-                                key={note.id || note.name}
                                 direction="column"
                                 justifyContent="center"
-                                alignItems="center"
                                 gap="2rem"
-                                border="1px solid #ccc"
                                 padding="2rem"
-                                borderRadius="5%"
-                                className="box"
                             >
-                                <View>
-                                    <Heading level="3">{note.name}</Heading>
-                                </View>
-                                <Text fontStyle="italic">{note.description}</Text>
-                                {note.image && (
-                                    <Image
-                                        src={note.image}
-                                        alt={`visual aid for ${notes.name}`}
-                                        style={{ width: 400 }}
-                                    />
-                                )}
-                                <Button
-                                    variation="destructive"
-                                    onClick={() => deleteNote(note)}
-                                >
-                                    Delete note
+                                <TextField
+                                    name="name"
+                                    placeholder="Note Name"
+                                    label="Note Name"
+                                    labelHidden
+                                    variation="quiet"
+                                    required
+                                />
+                                <AiDescription />
+                                <View
+                                    name="image"
+                                    as="input"
+                                    type="file"
+                                    alignSelf={"end"}
+                                    accept="image/png, image/jpeg"
+                                />
+
+                                <Button type="submit" variation="primary">
+                                    Save Note
                                 </Button>
                             </Flex>
-                        ))}
-                    </Grid>
-                    <Button onClick={signOut}>Sign Out</Button>
-                </Flex>
-            )}
-        </Authenticator>
+                        </View>
+                        <Divider />
+                        <Heading level={2}>Current Notes</Heading>
+                        <Grid
+                            margin="3rem 0"
+                            autoFlow="column"
+                            justifyContent="center"
+                            gap="2rem"
+                            alignContent="center"
+                        >
+                            {notes.map((note) => (
+                                <Flex
+                                    key={note.id || note.name}
+                                    direction="column"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    gap="2rem"
+                                    border="1px solid #ccc"
+                                    padding="2rem"
+                                    borderRadius="5%"
+                                    className="box"
+                                >
+                                    <View>
+                                        <Heading level="3">{note.name}</Heading>
+                                    </View>
+                                    <Text fontStyle="italic">{note.description}</Text>
+                                    {note.image && (
+                                        <Image
+                                            src={note.image}
+                                            alt={`visual aid for ${notes.name}`}
+                                            style={{ width: 400 }}
+                                        />
+                                    )}
+                                    <Button
+                                        variation="destructive"
+                                        onClick={() => deleteNote(note)}
+                                    >
+                                        Delete note
+                                    </Button>
+                                </Flex>
+                            ))}
+                        </Grid>
+                        <Button onClick={signOut}>Sign Out</Button>
+                    </Flex>
+                )}
+            </Authenticator>
+        </Flex>
     );
 }
