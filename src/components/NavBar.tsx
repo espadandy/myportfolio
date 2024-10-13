@@ -8,6 +8,7 @@ const Navbar: React.FC = () => {
         <Button variation="link"><Link href="/" style={styles.link}>Home</Link></Button>
         <Button variation="link"><Link href="/apps" style={styles.link}>Note</Link></Button>
         <Button variation="link"><Link href="/gallery" style={styles.link}>Gallery</Link></Button>
+        <Button variation="link"><Link href="/cv" style={styles.link}>CV</Link></Button>
       </div>
       <div style={styles.rightLinks}>
         <Button variation="link"><Link href="/login" style={styles.link}>Account</Link></Button>
