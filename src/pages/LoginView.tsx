@@ -1,5 +1,4 @@
 import { Authenticator, Button, Flex } from "@aws-amplify/ui-react";
-import React from 'react';
 export default function LoginView() {
     return (
         <Authenticator>

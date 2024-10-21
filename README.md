@@ -14,7 +14,7 @@ For local dev, run:
 
 Generate a amplify_outputs.json (production) for other apps (ios) to use:
 
-    npx ampx generate outputs --app-id dbvdz77y4msbb --branch main
+    npx ampx generate outputs --app-id dc57w24mt3g8s --branch main
 
 Generate data schema and classes for ios to use:
 
@@ -22,6 +22,6 @@ Generate data schema and classes for ios to use:
 
 If you encounter any problems with `npx ampx`, please check the local AWS profile.
 
-Deployed domain: https://main.dbvdz77y4msbb.amplifyapp.com
+Deployed domain: https://main.dc57w24mt3g8s.amplifyapp.com
 
 iOS app: https://github.com/espadandy/catdiary

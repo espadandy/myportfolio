@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+import "@aws-amplify/ui-react/styles.css";
 import {
     Authenticator,
     Button,
@@ -13,22 +14,54 @@ import {
     Grid,
     Divider,
 } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
 
 
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import { getUrl, uploadData } from "aws-amplify/storage";
 
+import type { Schema } from '../../amplify/data/resource'
 import outputs from "../../amplify_outputs.json";
 
+
 Amplify.configure(outputs);
-const client = generateClient({
-    authMode: "userPool",
-});
+const client = generateClient<Schema>();
+
+const AiDescription = () => {
+    const [description, setDescription] = useState<string>("");
+
+    const handleSetNewDescription = async () => {
+        const result = await client.queries.improveEnglish({
+            description: description,
+        })
+        setDescription(
+            result.data!.toString()
+        );
+    };
+
+    return (
+        <div>
+            <TextAreaField
+                label="New note"
+                name="description"
+                placeholder="Text your content here..."
+                rows={10}
+                size="large"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+            />
+            <Button
+                variation="primary"
+                onClick={() => handleSetNewDescription()}
+            >
+                Enhance your content with GPT
+            </Button>
+        </div>
+    );
+};
 
 export default function NotesView() {
-    const [notes, setNotes] = useState([]);
+    const [notes, setNotes] = useState<Schema["Note"]["type"][]>([]);
 
     useEffect(() => {
         fetchNotes();
@@ -43,7 +76,7 @@ export default function NotesView() {
                         path: ({ identityId }) => `media/${identityId}/${note.image}`,
                     });
                     console.log(linkToStorageFile.url);
-                    note.image = linkToStorageFile.url;
+                    note.image = linkToStorageFile.url.toString();
                 }
                 return note;
             })
@@ -52,33 +85,37 @@ export default function NotesView() {
         setNotes(notes);
     }
 
-    async function createNote(event) {
+    async function createNote(event: React.FormEvent<HTMLFormElement>) {
         console.log('create note!!!!!');
         event.preventDefault();
-        const form = new FormData(event.target);
-        console.log(form.get("image").name);
+        const form = new FormData(event.target as HTMLFormElement);
 
         const { data: newNote } = await client.models.Note.create({
-            name: form.get("name"),
-            description: form.get("description"),
-            image: form.get("image").name,
+            name: form.get("name")?.toString(),
+            description: form.get("description")?.toString(),
+            image: form.get("image")?.toString(),
         });
 
+        if (newNote === null) {
+            return;
+        }
         console.log(newNote);
-        if (newNote.image)
-            if (newNote.image)
-                await uploadData({
-                    path: ({ identityId }) => `media/${identityId}/${newNote.image}`,
 
-                    data: form.get("image"),
-                }).result;
-        fetchNotes();
-        event.target.reset();
+        if (newNote.image) {
+            await uploadData({
+                path: ({ identityId }) => `media/${identityId}/${newNote.image}`,
+                data: form.get("image")!
+            }).result;
+            fetchNotes();
+            const htmlForm = event.target as HTMLFormElement;
+            htmlForm.reset();
+        }
+
     }
 
-    async function deleteNote({ id }) {
+    async function deleteNote(note: Schema["Note"]["type"]) {
         const toBeDeletedNote = {
-            id: id,
+            id: note.id,
         };
 
         const { data: deletedNote } = await client.models.Note.delete(
@@ -89,42 +126,11 @@ export default function NotesView() {
         fetchNotes();
     }
 
-    const AiDescription = () => {
-        const [description, setDescription] = useState("");
-
-        const handleSetNewDescription = async () => {
-            const result = await client.queries.improveEnglish({
-                description: description,
-            })
-            setDescription(
-                result.data
-            );
-        };
-
-        return (
-            <div>
-                <TextAreaField
-                    label="New note"
-                    name="description"
-                    placeholder="Text your content here..."
-                    rows={10}
-                    size="large"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                />
-                <Button
-                    variation="primary"
-                    onClick={() => handleSetNewDescription()}
-                >
-                    Enhance your content with GPT
-                </Button>
-            </div>
-        );
-    };
-
     return (
         <Flex direction={'column'}>
-            <Heading>This is a note-taking application. After signing up, users can create notes that include a title, description, and image. The description can be enhanced with just one click using the GPT model. The application is hosted on Amazon Amplify.</Heading>
+            <Heading>
+                This is a note-taking application. After signing up, users can create notes that include a title, description, and image. The description can be enhanced with just one click using the GPT model. The application is hosted on Amazon Amplify.
+            </Heading>
             <Authenticator>
                 {({ signOut }) => (
                     <Flex
@@ -187,13 +193,13 @@ export default function NotesView() {
                                     className="box"
                                 >
                                     <View>
-                                        <Heading level="3">{note.name}</Heading>
+                                        <Heading level={3}>{note.name}</Heading>
                                     </View>
                                     <Text fontStyle="italic">{note.description}</Text>
                                     {note.image && (
                                         <Image
                                             src={note.image}
-                                            alt={`visual aid for ${notes.name}`}
+                                            alt={`visual aid for ${note.name}`}
                                             style={{ width: 400 }}
                                         />
                                     )}

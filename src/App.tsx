@@ -1,6 +1,5 @@
-import React from 'react'
 import NavBar from './components/NavBar'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import NotesView from "./pages/NotesView";
 import Home from './pages/Home'
